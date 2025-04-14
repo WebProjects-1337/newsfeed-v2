@@ -1,0 +1,36 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 14.17.4
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build project
+      run: npm run build
+
+    - name: Deploy to GitHub Pages
+      run: |
+        mkdir -p public
+        cp -r dist/* public/
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "<>"
+        git checkout --orphan gh-pages
+        git --work-tree=public add --all
+        git --work-tree=public commit -m "Deploy"
+        git push origin HEAD:gh-pages --force
